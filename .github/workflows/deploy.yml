@@ -1,0 +1,35 @@
+name: Deploy to Google Apps Script
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install latest clasp
+        run: npm install -g @google/clasp@latest
+
+      - name: Decode service account
+        run: echo "${{ secrets.GCP_CREDENTIALS_BASE64 }}" | base64 --decode > $HOME/service_account.json
+
+      - name: Deploy metering-data
+        run: |
+          echo "🚀 Deploying metering-data..."
+          cd metering-data
+          clasp push --force --service-account $HOME/service_account.json
+
+      - name: Deploy metering-foto
+        run: |
+          echo "📸 Deploying metering-foto..."
+          cd metering-foto
+          clasp push --force --service-account $HOME/service_account.json
