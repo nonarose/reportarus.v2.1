@@ -1,73 +1,73 @@
 function doGet(e) {
   return ContentService
-    .createTextOutput(JSON.stringify({ message: "GET request received" }))
+    .createTextOutput(JSON.stringify({ message: "Sistem Metering V2 Aktif" }))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
 function doOptions(e) {
-  return ContentService
-    .createTextOutput('')
-    .setMimeType(ContentService.MimeType.TEXT)
-    .setHeader('Access-Control-Allow-Origin', '*')
-    .setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-    .setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  return ContentService.createTextOutput('');
 }
 
 function doPost(e) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+
   try {
     const data = JSON.parse(e.postData.contents);
-    const ss = SpreadsheetApp.openById("1RINOJksDoj6QyNTVi31B50fhR-Nf_COe1HFOqnVHVpc");
-    const sheet = ss.getSheetByName("REKAP_ALL");
+    
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("REKAP_ALL");
+    if (!sheet) throw new Error("Sheet REKAP_ALL tidak ditemukan.");
 
-    // Ambil header kolom
-    const header = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const lastCol = sheet.getLastColumn();
+    if (lastCol === 0) throw new Error("Header tidak ditemukan.");
+
+    // Mapping header agar tahan banting walau kolom digeser
+    const header = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
     const headerIndex = {};
-    header.forEach((name, i) => headerIndex[name.trim().toLowerCase()] = i);
+    header.forEach((name, i) => {
+      if (name) headerIndex[name.toString().trim().toLowerCase()] = i;
+    });
 
-    // Bentuk baris baru berdasarkan data yang dikirim
-    function bentukBaris(row) {
-      const values = new Array(header.length).fill("");
-      const now = new Date();
+    const rowValues = new Array(header.length).fill("");
+    const submissionTime = new Date();
 
-      if (headerIndex["timestamp"] !== undefined) values[headerIndex["timestamp"]] = now;
-      if (headerIndex["satuan kerja"] !== undefined) values[headerIndex["satuan kerja"]] = row.satuan_kerja || "";
-      if (headerIndex["nama petugas"] !== undefined) values[headerIndex["nama petugas"]] = row.petugas || "";
-      if (headerIndex["tanggal"] !== undefined) values[headerIndex["tanggal"]] = row.tanggal || "";
-      if (headerIndex["shift"] !== undefined) values[headerIndex["shift"]] = row.shift || "";
-      if (headerIndex["mcb/pdb"] !== undefined) values[headerIndex["mcb/pdb"]] = row.jenis || row.mcb || "";
-      if (headerIndex["r"] !== undefined) values[headerIndex["r"]] = row.arus_r || "";
-      if (headerIndex["s"] !== undefined) values[headerIndex["s"]] = row.arus_s || "";
-      if (headerIndex["t"] !== undefined) values[headerIndex["t"]] = row.arus_t || "";
-      if (headerIndex["catatan"] !== undefined) values[headerIndex["catatan"]] = row.catatan || "";
-      if (headerIndex["foto"] !== undefined) values[headerIndex["foto"]] = row.foto || "";
-      return values;
-    }
+    // Pemetaan ke 16 Kolom
+    if (headerIndex["timestamp"] !== undefined) rowValues[headerIndex["timestamp"]] = submissionTime;
+    if (headerIndex["tanggal"] !== undefined) rowValues[headerIndex["tanggal"]] = data.tanggal || "";
+    if (headerIndex["shift"] !== undefined) rowValues[headerIndex["shift"]] = data.shift || "";
+    if (headerIndex["nama petugas"] !== undefined) rowValues[headerIndex["nama petugas"]] = data.petugas || "";
+    if (headerIndex["lokasi / tx"] !== undefined) rowValues[headerIndex["lokasi / tx"]] = data.satuan_kerja || "Tx Gombel";
 
-    // === Proses tulis ke sheet ===
-    const allValues = [];
+    // MDB
+    if (headerIndex["mdb utama - r"] !== undefined) rowValues[headerIndex["mdb utama - r"]] = data.mdb_r || "";
+    if (headerIndex["mdb utama - s"] !== undefined) rowValues[headerIndex["mdb utama - s"]] = data.mdb_s || "";
+    if (headerIndex["mdb utama - t"] !== undefined) rowValues[headerIndex["mdb utama - t"]] = data.mdb_t || "";
 
-    if (Array.isArray(data)) {
-      data.forEach(row => allValues.push(bentukBaris(row)));
-    } else {
-      for (let key in data) {
-        allValues.push(bentukBaris(data[key]));
-      }
-    }
+    // PDB Pemancar
+    if (headerIndex["pdb pemancar - r"] !== undefined) rowValues[headerIndex["pdb pemancar - r"]] = data.pem_r || "";
+    if (headerIndex["pdb pemancar - s"] !== undefined) rowValues[headerIndex["pdb pemancar - s"]] = data.pem_s || "";
+    if (headerIndex["pdb pemancar - t"] !== undefined) rowValues[headerIndex["pdb pemancar - t"]] = data.pem_t || "";
 
-    if (allValues.length > 0) {
-      sheet.getRange(sheet.getLastRow() + 1, 1, allValues.length, allValues[0].length).setValues(allValues);
-    }
+    // PDB Sarpras
+    if (headerIndex["pdb sarpras - r"] !== undefined) rowValues[headerIndex["pdb sarpras - r"]] = data.sar_r || "";
+    if (headerIndex["pdb sarpras - s"] !== undefined) rowValues[headerIndex["pdb sarpras - s"]] = data.sar_s || "";
+    if (headerIndex["pdb sarpras - t"] !== undefined) rowValues[headerIndex["pdb sarpras - t"]] = data.sar_t || "";
 
-    // === Respon sukses ===
+    // Catatan & Link Foto
+    if (headerIndex["catatan"] !== undefined) rowValues[headerIndex["catatan"]] = data.catatan || "";
+    if (headerIndex["link foto"] !== undefined) rowValues[headerIndex["link foto"]] = data.link_foto || "";
+
+    sheet.appendRow(rowValues);
+
     return ContentService
-      .createTextOutput(JSON.stringify({ status: "success" }))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeader('Access-Control-Allow-Origin', '*');
+      .createTextOutput(JSON.stringify({ status: "success", message: "Data Metering Berhasil Disimpan" }))
+      .setMimeType(ContentService.MimeType.JSON);
 
   } catch (err) {
     return ContentService
-      .createTextOutput(JSON.stringify({ status: "error", message: err.message }))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeader('Access-Control-Allow-Origin', '*');
+      .createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
   }
 }
