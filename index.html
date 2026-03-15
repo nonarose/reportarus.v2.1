@@ -856,72 +856,52 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     return; 
   }
 
-  // --- FREEZE TOMBOL ---
   const btnKirim = document.getElementById('submitBtn');
   btnKirim.disabled = true; 
   btnKirim.style.background = "#6c757d"; 
   btnKirim.textContent = "⏳ Sedang memproses... JANGAN DITUTUP";
   status.textContent = "⏳ Mengirim data ke server...";
 
-  // 1. Siapkan "Bungkus Tunggal" untuk Spreadsheet
   const flatData = {
     tanggal: document.getElementById('tanggal').value,
     shift: document.getElementById('shift').value,
     petugas: document.getElementById('petugas').value,
     satuan_kerja: document.getElementById('satuan_kerja').value,
-    link_foto: fotoDriveURL || "", // Link foto dari Drive
+    link_foto: fotoDriveURL || "", 
     catatan: ""
   };
 
-  // 2. Mapping Otomatis: Memindahkan Arus dari savedReports ke Kolom yang Benar
   let listCatatan = [];
-  
   Object.values(savedReports).forEach(row => {
     const namaPanel = row.jenis.toLowerCase();
-    
-    // Cek keyword nama panel untuk menentukan kolom
     if (namaPanel.includes("mdb")) {
-      flatData.mdb_r = row.arus_r;
-      flatData.mdb_s = row.arus_s;
-      flatData.mdb_t = row.arus_t;
+      flatData.mdb_r = row.arus_r; flatData.mdb_s = row.arus_s; flatData.mdb_t = row.arus_t;
     } else if (namaPanel.includes("pemancar")) {
-      flatData.pem_r = row.arus_r;
-      flatData.pem_s = row.arus_s;
-      flatData.pem_t = row.arus_t;
+      flatData.pem_r = row.arus_r; flatData.pem_s = row.arus_s; flatData.pem_t = row.arus_t;
     } else if (namaPanel.includes("sarpras")) {
-      flatData.sar_r = row.arus_r;
-      flatData.sar_s = row.arus_s;
-      flatData.sar_t = row.arus_t;
+      flatData.sar_r = row.arus_r; flatData.sar_s = row.arus_s; flatData.sar_t = row.arus_t;
     }
-    
     if (row.catatan) listCatatan.push(`${row.jenis}: ${row.catatan}`);
   });
-
-  // Gabungkan catatan semua panel jadi satu baris teks
   flatData.catatan = listCatatan.join(" | ");
 
   try {
-    // 3. Kirim ke Apps Script sebagai SATU OBJEK
     await fetch(scriptURL, {
       method: 'POST',
-      mode: 'no-cors', // Tetap pakai no-cors agar aman di GitHub Pages
+      mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(flatData) 
     });
 
-    status.textContent = "✅ Sukses! Data 1 baris terkirim ke REKAP_ALL.";
+    status.textContent = "✅ Data terkirim ke Spreadsheet!";
     showToast("✅ Berhasil Kirim Data V2!");
-    
-    // 4. Bersihkan Form & Preview
-    savedReports = {}; 
-    tempInputs = {};
+    savedReports = {}; tempInputs = {};
     document.getElementById('previewTitle').textContent = "✅ Data Berhasil Terkirim";
     fotoPreview.classList.add("hidden");
     downloadBtn.classList.add("hidden");
     fotoStatus.textContent = "— belum ada foto";
     fotoDriveURL = "";
     renderOutput(); 
-    
   } catch (err) {
     console.error(err);
     status.textContent = "❌ Gagal kirim. Cek koneksi.";
@@ -932,14 +912,33 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     btnKirim.textContent = "📤 Kirim ke Spreadsheet Data Metering";
   }
 });
+
+/* ---------- FIX TOMBOL PANDUAN "?" ---------- */
 const flowBtn = document.getElementById("flowBtn");
 const flowModal = document.getElementById("flowModal");
 const flowImg = document.getElementById("flowImg");
 const closeFlow = document.getElementById("closeFlow");
-const flowImgURL = "https://raw.githubusercontent.com/nonarose/formmeteringaruslistrik/refs/heads/main/flowchart_form.svg";
-flowBtn.addEventListener("click", () => { flowImg.src = flowImgURL; flowModal.classList.add("show"); });
-closeFlow.addEventListener("click", () => { flowModal.classList.remove("show"); });
-flowModal.addEventListener("click", (e) => { if (e.target === flowModal) flowModal.classList.remove("show"); });
+
+// Gunakan link RAW Github agar gambar bisa tampil di <img> tag
+const flowImgURL = "https://raw.githubusercontent.com/nonarose/reportarus.v2.1/main/flowchart_form.svg";
+
+flowBtn.addEventListener("click", () => { 
+  flowImg.src = flowImgURL; 
+  flowModal.classList.remove("hidden"); // Hapus class hidden agar display:none !important hilang
+  flowModal.classList.add("show");      // Tambahkan class show untuk display:flex
+});
+
+closeFlow.addEventListener("click", () => { 
+  flowModal.classList.remove("show"); 
+  flowModal.classList.add("hidden");    // Kembalikan class hidden
+});
+
+flowModal.addEventListener("click", (e) => { 
+  if (e.target === flowModal) { 
+    flowModal.classList.remove("show"); 
+    flowModal.classList.add("hidden"); 
+  } 
+});
 
 </script>
 </body>
