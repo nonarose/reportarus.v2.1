@@ -6,7 +6,7 @@
   <title>Form Monitoring MCCB</title>
   <link rel="icon" href="logo.png" type ="image/png"/>
   <style>
-    /* --- STYLES ASLI ROSNABILA --- */
+    /* --- STYLES --- */
     body { font-family: 'Segoe UI', sans-serif; background-color: #0d3b66; margin: 0; padding: 0; color: #000; }
     .container { background: #fff; border-radius: 20px; padding: 20px; max-width: 850px; margin: 40px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
     h1 { text-align: center; color: #0d3b66; margin-bottom: 20px; }
@@ -14,7 +14,7 @@
     textarea { resize: vertical; }
     button { background: #0d3b66; color: #fff; border: none; cursor: pointer; font-weight: 600; transition: background 0.2s; margin-top: 10px; }
     button:hover { background: #094a8a; }
-    #toast { visibility: hidden; min-width: 250px; background-color: #0d3b66; color: #fff; text-align: center; border-radius: 8px; padding: 10px; position: fixed; z-index: 10002; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; opacity: 0; transition: opacity 0.5s, bottom 0.5s; }
+    #toast { visibility: hidden; min-width: 250px; background-color: #0d3b66; color: #fff; text-align: center; border-radius: 8px; padding: 10px; position: fixed; z-index: 1; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; opacity: 0; transition: opacity 0.5s, bottom 0.5s; }
     #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
     .hidden { display: none !important; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -25,6 +25,7 @@
     .arus-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 16px; }
     .preview { margin-top: 20px; }
     
+    /* Tombol Upload */
     .btn-foto { padding: 12px; border-radius: 8px; border: none; color: #fff; font-weight: bold; cursor: pointer; flex: 1; margin: 0; font-size: 14px; }
     .btn-kamera { background: #28a745; }
     .btn-kamera:hover { background: #218838; }
@@ -38,6 +39,7 @@
     .flowContent img { max-width: 100%; height: auto; border-radius: 8px; }
     #closeFlow { position: absolute; top: 8px; right: 16px; font-size: 28px; font-weight: bold; color: #444; cursor: pointer; }
     
+    /* Custom Modal Timestamp Terpadu */
     #timestampModal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 10001; }
     .ts-content { background: #fff; padding: 20px; border-radius: 12px; max-width: 90%; text-align: center; width: 380px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
     .ts-content h3 { color: #0d3b66; margin-top: 0; margin-bottom: 10px; }
@@ -47,6 +49,7 @@
     .shift-box { background: #f4f8fb; border: 1px solid #c2d1d9; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
     .manual-time-container { display: flex; gap: 8px; align-items: center; margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 10px; }
 
+    /* Custom Modal Webcam Desktop */
     #webcamModal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10005; }
     #videoStream { width: 100%; max-width: 600px; border-radius: 12px; background: #000; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     .webcam-btn-container { display: flex; gap: 15px; }
@@ -84,6 +87,7 @@
     <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 15px; background: #eef2f5; padding: 10px; border-radius: 8px; border: 1px solid #c2d1d9;">
       <div style="flex: 1;">
         <p id="lokasiStatus2" class="small" style="margin: 0; font-weight: bold; line-height: 1.4;">📍 Sedang mencari lokasi satelit...</p>
+        
         <div id="cacheFallback" style="display: none; margin-top: 10px; padding-top: 8px; border-top: 1px dashed #ccc;">
           <p id="cacheText" style="margin: 0; font-size: 11px; color: #555; margin-bottom: 6px;">Lokasi tersimpan: -</p>
           <button type="button" id="btnPakaiCache" style="padding: 6px 10px; font-size: 11px; background: #28a745; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">✅ Pakai lokasi ini</button>
@@ -95,14 +99,18 @@
     <form id="formPage">
       <label>Nama Petugas:</label>
       <input type="text" id="petugas" readonly />
+
       <label>Satuan Kerja:</label>
       <input type="text" id="satuan_kerja" readonly />
 
       <div class="form-row">
-        <div><label>Tanggal:</label><input type="date" id="tanggal" required /></div>
+        <div>
+          <label>Tanggal:</label>
+          <input type="date" id="tanggal" required style="margin-bottom:0;" />
+        </div>
         <div>
           <label>Shift:</label>
-          <select id="shift">
+          <select id="shift" style="margin-bottom:0;">
             <option value="">-- Pilih Shift --</option>
             <option>Shift 1</option>
             <option>Shift 2</option>
@@ -116,17 +124,30 @@
         <button type="button" id="btnKamera" class="btn-foto btn-kamera">📸 Kamera Langsung</button>
         <button type="button" id="btnGaleri" class="btn-foto btn-galeri">🖼️ Buka Galeri</button>
       </div>
+      
       <input type="file" id="foto" accept="image/*" style="display: none;" />
+      
       <div id="fotoStatus" class="small" style="margin-top:6px; margin-bottom:15px; color:#444;">— belum ada foto</div>
 
       <label>Jenis MCCB / PDB:</label>
-      <select id="mccb"><option value="">-- Pilih MCCB/PDB --</option></select>
+      <select id="mccb">
+        <option value="">-- Pilih MCCB/PDB --</option>
+      </select>
 
       <label>Arus (Ampere):</label>
       <div class="arus-row">
-        <div><label>Arus R:</label><input type="number" id="arus_r" step="0.01" /></div>
-        <div><label>Arus S:</label><input type="number" id="arus_s" step="0.01" /></div>
-        <div><label>Arus T:</label><input type="number" id="arus_t" step="0.01" /></div>
+        <div>
+          <label for="arus_r">Arus R (A):</label>
+          <input type="number" id="arus_r" step="0.01" style="margin-bottom:0;" />
+        </div>
+        <div>
+          <label for="arus_s">Arus S (A):</label>
+          <input type="number" id="arus_s" step="0.01" style="margin-bottom:0;" />
+        </div>
+        <div>
+          <label for="arus_t">Arus T (A):</label>
+          <input type="number" id="arus_t" step="0.01" style="margin-bottom:0;" />
+        </div>
       </div>
 
       <label>Catatan:</label>
@@ -137,10 +158,13 @@
     </form>
 
     <div id="status"></div>
+
     <div class="preview">
       <h3 id="previewTitle">📋 Data Tersimpan (Belum Dikirim)</h3>
       <img id="fotoPreview" class="hidden" alt="Preview foto" style="max-width:100%; margin-bottom:8px; border-radius:8px;">
+      
       <button type="button" id="downloadBtn" class="hidden" style="background:#ffc107; color:#000; margin-bottom:15px;">⬇️ Unduh Gambar Ber-Watermark</button>
+      
       <div id="output"></div>
     </div>
   </div>
@@ -149,21 +173,34 @@
   <button id="flowBtn" title="Lihat Panduan">❓</button>
 
   <div id="flowModal" class="hidden">
-    <div class="flowContent"><span id="closeFlow">&times;</span><h2>🧭 Panduan Pengisian</h2><img id="flowImg" src="" /></div>
+    <div class="flowContent">
+      <span id="closeFlow">&times;</span>
+      <h2>🧭 Panduan Pengisian</h2>
+      <img id="flowImg" src="" alt="Flowchart Panduan" />
+    </div>
   </div>
 
   <div id="timestampModal">
     <div class="ts-content">
       <h3>Opsi Watermark Foto</h3>
-      <p id="modalDesc"></p>
-      <button id="btnSkipWm" class="btn-ts" style="background: #6c757d; color: #fff; display: none;">📁 Foto Sudah Bergeotag</button>
-      <div id="matchOptions" style="display: none;"><button id="btnTambahkanWm" class="btn-ts btn-ts-today">📍 Tambah Watermark Geotag</button></div>
+      <p id="modalDesc" style="font-size: 13px; color: #444; margin-bottom: 15px;"></p>
+      
+      <button id="btnSkipWm" class="btn-ts" style="background: #6c757d; color: #fff; margin-bottom: 15px; display: none;">📁 Foto Saya Sudah Bergeotag<br><small style="font-weight:normal;">(Upload Tanpa Watermark Tambahan)</small></button>
+
+      <div id="matchOptions" style="display: none;">
+        <button id="btnTambahkanWm" class="btn-ts btn-ts-today" style="margin-bottom: 0;">📍 Tambahkan Watermark Geotag<br><small id="lblTambahkanWm" style="font-weight:normal;"></small></button>
+      </div>
+
       <div id="mismatchOptions" style="display: none;">
-        <button id="btnTsToday" class="btn-ts btn-ts-today">📍 Gunakan Waktu Saat Ini</button>
+        <button id="btnTsToday" class="btn-ts btn-ts-today">📍 Gunakan Waktu Saat Ini<br><small id="lblTsToday" style="font-weight:normal;"></small></button>
+        
         <div class="shift-box">
-          <button id="btnTsShift" class="btn-ts btn-ts-shift">📍 Sesuai Input Shift</button>
+          <button id="btnTsShift" class="btn-ts btn-ts-shift" style="margin-bottom: 0;">📍 Sesuai Input Shift<br><small id="lblTsShift" style="font-weight:normal;"></small></button>
+          
           <div class="manual-time-container">
-            <input type="time" id="manualTime" style="flex:1" /><button id="btnTsManual">Pilih Jam</button>
+            <span style="font-size: 11px; color: #666; font-weight: bold;">Atau Atur Manual:</span>
+            <input type="time" id="manualTime" style="margin: 0; flex: 1; font-size: 12px; padding: 6px;" />
+            <button id="btnTsManual" style="margin: 0; padding: 6px 10px; font-size: 11px; background: #e0e0e0; color: #333; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; cursor: pointer;">Pilih Jam</button>
           </div>
         </div>
       </div>
@@ -171,174 +208,741 @@
   </div>
 
   <div id="webcamModal">
+    <h3 style="color:white; margin-bottom:15px;">Ambil Foto (Webcam)</h3>
     <video id="videoStream" autoplay playsinline></video>
-    <div class="webcam-btn-container"><button id="btnSnap" class="btn-jepret">📸 Jepret</button><button id="btnCloseCamera" class="btn-tutup-webcam">Batal</button></div>
     <canvas id="cameraCanvas" style="display:none;"></canvas>
+    <div class="webcam-btn-container">
+      <button id="btnSnap" class="btn-jepret">📸 Jepret Foto</button>
+      <button id="btnCloseCamera" class="btn-tutup-webcam">Batal</button>
+    </div>
   </div>
 
 <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbzFR8pSG259Md11je_R92YTxl_zmIoHZHIHt_H1qf66bEdiqdgKagmsbY0GNbHvdxaSbA/exec"; 
 const fotoUploadURL = "https://script.google.com/macros/s/AKfycbxOsZ8NO-TSe9QI3xBnt81hOuv7r3H1VKs8QYvr9UsUOoM6NmTEFGY2VI5Zesj_kZSvZQ/exec"; 
 
-/* DOM refs & State ASLI */
+/* DOM refs */
 const lokasiEl = document.getElementById('lokasiStatus2');
 const btnRetryLokasi = document.getElementById('btnRetryLokasi');
 const cacheFallback = document.getElementById('cacheFallback');
+const cacheText = document.getElementById('cacheText');
+const btnPakaiCache = document.getElementById('btnPakaiCache');
 const output = document.getElementById('output');
 const status = document.getElementById('status');
+const loginBtn = document.getElementById('loginBtn');
+const loginNama = document.getElementById('loginNama');
+const loginSatuan = document.getElementById('loginSatuan');
+const loginSection = document.getElementById('loginSection');
+const formSection = document.getElementById('formSection');
+
+// DOM Refs Foto & Webcam
+const btnKamera = document.getElementById('btnKamera');
+const btnGaleri = document.getElementById('btnGaleri');
 const foto = document.getElementById('foto');
 const webcamModal = document.getElementById('webcamModal');
 const videoStream = document.getElementById('videoStream');
 const cameraCanvas = document.getElementById('cameraCanvas');
+const btnSnap = document.getElementById('btnSnap');
+const btnCloseCamera = document.getElementById('btnCloseCamera');
+
+let desktopStream = null;
+let isFromGallery = false; // Pelacak sumber gambar (Kamera/Galeri)
+
 const fotoStatus = document.getElementById('fotoStatus');
 const fotoPreview = document.getElementById('fotoPreview');
 const downloadBtn = document.getElementById('downloadBtn');
 const el = { mccb: document.getElementById('mccb') };
+const ORDER_PDB = ["MDB Utama/PLN", "PDB Pemancar", "PDB Sarpras"];
+const ORDER_MCCB = [
+  "MCCB GPO/Administrasi","MCCB Peralatan G. Ops.","MCCB Pen. Lantai 2 G. Ops.",
+  "MCCB AC Lantai 2 G. Ops.","MCCB AC Studio Utama","MCCB AC R. Berita / Siaran Lantai 2, G.Ops.",
+  "MCCB Studio 2 dan AC Teknik","MCCB Lap. Tenis/AC R. Redaksi G. Ops.",
+  "MCCB AC Lantai 1 G. Ops.","MCCB Dimer/Lighting Sto. 1","MCCB Outdoor/L. Taman"
+];
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
 
-let savedReports = {};
+let dataPerMCB = {};
 let lokasiTeks = {};
 let tempInputs = {};
 let fotoDriveURL = ""; 
 let loginTimestamp ="";
 let currentCompressedDataURL = "";
-const canvas = document.createElement('canvas');
-const ctx = canvas.getContext('2d');
+let savedReports = {};
 
-const ORDER_PDB = ["MDB Utama/PLN", "PDB Pemancar", "PDB Sarpras"];
-const ORDER_MCCB = ["MCCB GPO/Administrasi","MCCB Peralatan G. Ops.","MCCB Pen. Lantai 2 G. Ops.","MCCB AC Lantai 2 G. Ops.","MCCB AC Studio Utama","MCCB AC R. Berita / Siaran Lantai 2, G.Ops.","MCCB Studio 2 dan AC Teknik","MCCB Lap. Tenis/AC R. Redaksi G. Ops.","MCCB AC Lantai 1 G. Ops.","MCCB Dimer/Lighting Sto. 1","MCCB Outdoor/L. Taman"];
-
-/* --- FUNGSI UI & LOGIC ASLI (REVERSE GEO, WATERMARK, DLL) --- */
+/* ---------- helper UI ---------- */
 function showToast(msg) {
   const toast = document.getElementById("toast");
-  toast.textContent = msg; toast.classList.add("show");
+  toast.textContent = msg;
+  toast.classList.remove("show");
+  void toast.offsetWidth;
+  toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), 3000);
 }
 
-function getLocation() {
-  lokasiEl.textContent = "📍 Sedang mencari lokasi satelit...";
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(async pos => {
-      const lat = pos.coords.latitude.toFixed(6), lng = pos.coords.longitude.toFixed(6);
-      lokasiTeks = { lat, lng };
-      try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
-        const d = await res.json(); lokasiTeks.alamat = d.display_name;
-        lokasiEl.textContent = `📍 ${d.display_name} (${lat}, ${lng})`;
-      } catch { lokasiEl.textContent = `📍 (${lat}, ${lng})`; }
-    }, () => { btnRetryLokasi.style.display = 'inline-block'; lokasiEl.textContent = "⚠️ Gagal GPS."; }, { enableHighAccuracy: true });
+/* ---------- geolocation + reverse + cache ---------- */
+function cekCacheLokasi() {
+  const latCache = localStorage.getItem('cachedLat');
+  const lngCache = localStorage.getItem('cachedLng');
+  const alamatCache = localStorage.getItem('cachedAlamat');
+  
+  if (latCache && lngCache) {
+    cacheFallback.style.display = 'block';
+    cacheText.innerHTML = `<strong>Lokasi tersimpan sebelumnya:</strong><br>${alamatCache || latCache + ', ' + lngCache}`;
+  } else {
+    cacheFallback.style.display = 'none';
   }
 }
-getLocation();
 
-function isiMCCB(unit){
-  const data = unit === "Stasiun Pucanggading" ? ORDER_MCCB : ORDER_PDB;
-  el.mccb.innerHTML ='<option value="">-- Pilih MCCB/PDB --</option>' + data.map(x => `<option value="${x}">${x}</option>`).join('');
+function getLocation() {
+  lokasiEl.textContent = "📍 Sedang mencari lokasi satelit... Tunggu ya.";
+  btnRetryLokasi.style.display = 'none';
+  cacheFallback.style.display = 'none';
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(async pos => {
+      const lat = pos.coords.latitude.toFixed(6);
+      const lng = pos.coords.longitude.toFixed(6);
+      lokasiTeks = { lat, lng };
+      
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+        const data = await res.json();
+        lokasiTeks.alamat = data.display_name;
+        lokasiEl.textContent = `📍 ${data.display_name} (${lat}, ${lng})`;
+        
+        localStorage.setItem('cachedLat', lat);
+        localStorage.setItem('cachedLng', lng);
+        localStorage.setItem('cachedAlamat', data.display_name || "");
+      } catch {
+        lokasiEl.textContent = `📍 (${lat}, ${lng})`;
+      }
+      
+      btnRetryLokasi.style.display = 'none';
+      cacheFallback.style.display = 'none';
+    }, err => {
+      btnRetryLokasi.style.display = 'inline-block';
+      cekCacheLokasi(); 
+      
+      if(err.code === 1) { 
+        lokasiEl.textContent = "⚠️ Izin lokasi ditolak browser.";
+        alert("LOKASI DITOLAK ATAU DIBLOKIR SISTEM!\n\n1. Jika dibuka dari WA: Buka lewat Chrome titik tiga pojok kanan atas.\n2. Jika sudah di Chrome: Klik gembok 🔒 di alamat web, pilih Izin, nyalakan Lokasi.");
+      } else if(err.code === 2) { 
+        lokasiEl.textContent = "⚠️ GPS mati / Sinyal lemah.";
+      } else if(err.code === 3) { 
+        lokasiEl.textContent = "⚠️ Waktu habis saat mencari lokasi.";
+      } else {
+        lokasiEl.textContent = "⚠️ Gagal mengambil lokasi.";
+      }
+    }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+  } else {
+    lokasiEl.textContent = "📍 Browser HP tidak mendukung fitur lokasi.";
+  }
 }
 
-document.getElementById('loginBtn').addEventListener('click', () => {
-  const nama = document.getElementById('loginNama').value.trim(), satuan = document.getElementById('loginSatuan').value;
-  if (!nama || !satuan) return alert("Isi identitas!");
-  document.getElementById('petugas').value = nama; document.getElementById('satuan_kerja').value = satuan;
-  document.getElementById('loginSection').classList.add('hidden'); document.getElementById('formSection').classList.remove('hidden');
+getLocation();
+
+btnRetryLokasi.addEventListener('click', () => {
+  lokasiTeks = {}; 
+  getLocation();
+});
+
+btnPakaiCache.addEventListener('click', () => {
+  lokasiTeks = {
+    lat: localStorage.getItem('cachedLat'),
+    lng: localStorage.getItem('cachedLng'),
+    alamat: localStorage.getItem('cachedAlamat')
+  };
+  lokasiEl.textContent = `📍 ${lokasiTeks.alamat || ''} (${lokasiTeks.lat}, ${lokasiTeks.lng}) [Lokasi Tersimpan]`;
+  
+  cacheFallback.style.display = 'none';
+  btnRetryLokasi.style.display = 'none';
+  showToast("✅ Menggunakan lokasi yang tersimpan.");
+});
+
+/* ---------- populate MCCB options ---------- */
+function isiMCCB(unit){
+  const data = unit === "Stasiun Pucanggading"
+    ? ["MCCB GPO/Administrasi","MCCB Peralatan G. Ops.","MCCB Pen. Lantai 2 G. Ops.","MCCB AC Lantai 2 G. Ops.","MCCB AC Studio Utama","MCCB AC R. Berita / Siaran Lantai 2, G.Ops.","MCCB Studio 2 dan AC Teknik","MCCB Lap. Tenis/AC R. Redaksi G. Ops.","MCCB AC Lantai 1 G. Ops.","MCCB Dimer/Lighting Sto. 1","MCCB Outdoor/L. Taman"]
+    : ["MDB Utama/PLN","PDB Pemancar","PDB Sarpras"];
+  el.mccb.innerHTML ='<option value="">-- Pilih MCCB/PDB --</option>' + data.map(x => `<option value="${x}">${x}</option>`).join('');
+}
+el.mccb.addEventListener("change", () => {
+  const prev = el.mccb.dataset.prev;
+  if (prev) {
+    tempInputs[prev] = {
+      r: document.getElementById('arus_r').value,
+      s: document.getElementById('arus_s').value,
+      t: document.getElementById('arus_t').value,
+      catatan: document.getElementById('catatan').value
+    };
+  }
+  const jenisBaru = el.mccb.value;
+  document.getElementById('arus_r').value = "";
+  document.getElementById('arus_s').value = "";
+  document.getElementById('arus_t').value = "";
+  document.getElementById('catatan').value = "";
+  if (tempInputs[jenisBaru]) {
+    const d = tempInputs[jenisBaru];
+    document.getElementById('arus_r').value = d.r;
+    document.getElementById('arus_s').value = d.s;
+    document.getElementById('arus_t').value = d.t;
+    document.getElementById('catatan').value = d.catatan;
+  }
+  el.mccb.dataset.prev = jenisBaru;
+});
+
+/* ---------- AUTO UPDATE TANGGAL & SHIFT DI TABEL ---------- */
+document.getElementById('shift').addEventListener('change', (e) => {
+  const newShift = e.target.value;
+  Object.keys(savedReports).forEach(k => savedReports[k].shift = newShift);
+  if (Object.keys(savedReports).length > 0) renderOutput(); 
+});
+
+document.getElementById('tanggal').addEventListener('change', (e) => {
+  const newTanggal = e.target.value;
+  Object.keys(savedReports).forEach(k => savedReports[k].tanggal = newTanggal);
+  if (Object.keys(savedReports).length > 0) renderOutput(); 
+});
+
+/* ---------- login flow ---------- */
+loginBtn.addEventListener('click', () => {
+  const nama = loginNama.value.trim();
+  const satuan = loginSatuan.value;
+  if (!nama || !satuan) { alert("Mohon isi Nama Petugas dan pilih Satuan Kerja terlebih dahulu."); return; }
+  loginTimestamp = new Date().toISOString();
+  localStorage.setItem('lastNamaPetugas', nama);
+  localStorage.setItem('lastSatuanKerja', satuan);
+  document.getElementById('petugas').value = nama;
+  document.getElementById('satuan_kerja').value = satuan;
+  loginSection.classList.add('hidden');
+  formSection.classList.remove('hidden');
   isiMCCB(satuan);
 });
 
-/* --- LOGIKA FOTO & WATERMARK (ROUNDED RECT & ICON) TETAP SAMA --- */
-async function prosesFoto(dataUrl) {
-  const tgl = document.getElementById('tanggal').value, shf = document.getElementById('shift').value;
-  if(!tgl || !shf) return alert("Pilih Tanggal & Shift!");
+window.addEventListener('load', () => {
+  const lastNama = localStorage.getItem('lastNamaPetugas');
+  const lastSatuan = localStorage.getItem('lastSatuanKerja');
   
-  // Trigger modal watermark
-  const modal = document.getElementById('timestampModal');
-  modal.style.display = 'flex';
-  document.getElementById('matchOptions').style.display = 'block';
-  
-  document.getElementById('btnTambahkanWm').onclick = async () => {
-    modal.style.display = 'none';
-    fotoStatus.textContent = "⏳ Memproses & Upload...";
-    currentCompressedDataURL = await compressAndWatermark(dataUrl, new Date().toLocaleString());
-    fotoPreview.src = currentCompressedDataURL; fotoPreview.classList.remove("hidden");
-    
-    const res = await fetch(fotoUploadURL, {
-      method: 'POST', body: new URLSearchParams({ filedata: currentCompressedDataURL.split(",")[1], mimetype: "image/jpeg", petugas: document.getElementById('petugas').value, satuan_kerja: document.getElementById('satuan_kerja').value })
-    });
-    const result = await res.json();
-    fotoDriveURL = result.url; fotoStatus.textContent = "✅ Foto Tersimpan.";
-  };
+  if (lastNama) {
+    loginNama.value = lastNama;
+    if (lastSatuan) {
+      loginSatuan.value = lastSatuan;
+    }
+    document.getElementById('loginStatus').innerHTML = `🔹 Terakhir login sebagai <strong>${lastNama}</strong>${ lastSatuan ? ` (${lastSatuan})` : "" }.`;
+  }
+});
+
+/* ---------- Format Waktu Default Helper ---------- */
+function formatTimeCustom(dateObj) {
+  const dd = String(dateObj.getDate()).padStart(2, '0');
+  const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const yyyy = dateObj.getFullYear();
+  const hh = String(dateObj.getHours()).padStart(2, '0');
+  const min = String(dateObj.getMinutes()).padStart(2, '0');
+  const ss = String(dateObj.getSeconds()).padStart(2, '0');
+  return `${dd}/${mm}/${yyyy} ${hh}:${min}:${ss}`;
 }
 
-function compressAndWatermark(dataURL, ts) {
+function formatDateFromInput(tglStr, timeStr) {
+  const [y, m, d] = tglStr.split('-');
+  return `${d}/${m}/${y} ${timeStr}`;
+}
+
+function getCurrentShift(now) {
+  const h = now.getHours();
+  const m = now.getMinutes();
+  if (h < 8 || (h === 8 && m === 0)) return "Shift 1"; 
+  if (h < 16 || (h === 16 && m === 0)) return "Shift 2"; 
+  return "Shift 3"; 
+}
+
+/* ---------- custom Modal Timestamp Promise Terpadu ---------- */
+function askWatermarkOptions(isMismatch, tglInput, shift, fromGallery) {
+  return new Promise(resolve => {
+    const modal = document.getElementById('timestampModal');
+    const desc = document.getElementById('modalDesc');
+    const matchOpts = document.getElementById('matchOptions');
+    const mismatchOpts = document.getElementById('mismatchOptions');
+    const btnSkipWm = document.getElementById('btnSkipWm');
+    
+    const now = new Date();
+    const todayStrFull = formatTimeCustom(now);
+    
+    let shiftTime = "08:00:00"; 
+    if(shift === "Shift 2") shiftTime = "16:00:00";
+    if(shift === "Shift 3") shiftTime = "23:59:00";
+    const shiftStrFull = formatDateFromInput(tglInput, shiftTime);
+
+    btnSkipWm.style.display = fromGallery ? 'block' : 'none';
+
+    if (isMismatch) {
+      desc.textContent = "Tanggal atau Shift tidak sesuai dengan jadwal saat ini. Pilih opsi watermark:";
+      matchOpts.style.display = 'none';
+      mismatchOpts.style.display = 'block';
+      document.getElementById('lblTsToday').textContent = todayStrFull;
+      document.getElementById('lblTsShift').textContent = shiftStrFull;
+    } else {
+      desc.textContent = "Pilih apakah foto ini perlu ditambahkan watermark Geotag:";
+      matchOpts.style.display = 'block';
+      mismatchOpts.style.display = 'none';
+      document.getElementById('lblTambahkanWm').textContent = todayStrFull;
+    }
+
+    modal.style.display = 'flex';
+
+    document.getElementById('btnSkipWm').onclick = () => {
+      modal.style.display = 'none';
+      resolve({ skip: true, timestamp: "" });
+    };
+
+    document.getElementById('btnTambahkanWm').onclick = () => {
+      modal.style.display = 'none';
+      resolve({ skip: false, timestamp: todayStrFull });
+    };
+
+    document.getElementById('btnTsToday').onclick = () => {
+      modal.style.display = 'none';
+      resolve({ skip: false, timestamp: todayStrFull });
+    };
+    
+    document.getElementById('btnTsShift').onclick = () => {
+      modal.style.display = 'none';
+      resolve({ skip: false, timestamp: shiftStrFull });
+    };
+    
+    document.getElementById('btnTsManual').onclick = () => {
+      let manualVal = document.getElementById('manualTime').value;
+      if(!manualVal) {
+        alert("Atur jam di kolom sebelahnya terlebih dahulu!");
+        return;
+      }
+      modal.style.display = 'none';
+      if(manualVal.split(':').length === 2) manualVal += ":00";
+      const manualStrFull = formatDateFromInput(tglInput, manualVal);
+      resolve({ skip: false, timestamp: manualStrFull });
+    };
+  });
+}
+
+/* ---------- helper: read file -> dataURL ---------- */
+function readFileAsDataURL(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = e => rej(e);
+    r.readAsDataURL(file);
+  });
+}
+
+/* ---------- helper: draw rounded rectangle ---------- */
+function drawRoundRect(ctx, x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+  ctx.fill();
+}
+
+/* ---------- compress & watermark ---------- */
+function compressAndWatermark(dataURL, customTimestamp, skipWatermark) {
   return new Promise(res => {
     const img = new Image();
     img.onload = () => {
-      canvas.width = 1200; canvas.height = (1200/img.width)*img.height;
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      // Gambar gaya estetik asli kamu
-      ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
-      ctx.fillRect(20, canvas.height - 120, canvas.width - 40, 100);
-      ctx.fillStyle = "white"; ctx.font = "bold 24px Segoe UI";
-      ctx.fillText(`${document.getElementById('petugas').value} — ${document.getElementById('satuan_kerja').value}`, 40, canvas.height - 85);
-      ctx.font = "18px Segoe UI";
-      ctx.fillText(`📍 ${lokasiTeks.alamat || 'Alamat tidak ditemukan'}`, 40, canvas.height - 55);
-      ctx.fillText(`📅 ${ts} | GPS: ${lokasiTeks.lat}, ${lokasiTeks.lng}`, 40, canvas.height - 30);
-      res(canvas.toDataURL('image/jpeg', 0.8));
+      const maxW = 1200;
+      let w = img.naturalWidth, h = img.naturalHeight;
+      if (w > maxW) { const ratio = maxW / w; w = maxW; h = Math.round(h * ratio); }
+      canvas.width = w; canvas.height = h;
+      ctx.clearRect(0,0,w,h);
+      ctx.drawImage(img,0,0,w,h);
+
+      if (skipWatermark) {
+        res(canvas.toDataURL('image/jpeg', 0.75));
+        return; 
+      }
+
+      const titleSize = Math.max(18, Math.floor(h/35)); 
+      const textSize = Math.max(14, Math.floor(h/45));  
+      const padding = 20; 
+      const margin = 20;  
+      const cardWidth = w - (margin * 2);
+      const iconSize = textSize * 1.5; 
+      const iconMarginRight = 10;
+      const detailAvailableWidth = cardWidth - (padding * 2) - iconSize - iconMarginRight;
+
+      const petugas = document.getElementById('petugas').value || '';
+      const satuan = document.getElementById('satuan_kerja').value || '';
+      const titleText = `${petugas} — ${satuan}`;
+      
+      ctx.font = `${textSize}px Roboto, "Segoe UI", Arial, sans-serif`;
+      let addressLines = [];
+      if (lokasiTeks.alamat) {
+        addressLines = wrapTextToArray(ctx, lokasiTeks.alamat, detailAvailableWidth);
+      }
+      
+      let coordText = "Lokasi tidak tersedia";
+      if (lokasiTeks.lat && lokasiTeks.lng) {
+        coordText = `Lat ${lokasiTeks.lat}° Long ${lokasiTeks.lng}°`;
+      }
+      
+      const timeText = `${customTimestamp} GMT +07:00`;
+      const titleLineHeight = titleSize * 1.4;
+      const textLineHeight = textSize * 1.4;
+      const totalTextLines = addressLines.length + 2; 
+      const cardHeight = padding + titleLineHeight + 10 + (totalTextLines * textLineHeight) + padding;
+      const cardY = h - cardHeight - margin;
+      const cardX = margin;
+
+      const pinImg = new Image();
+      pinImg.onload = () => {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
+        drawRoundRect(ctx, cardX, cardY, cardWidth, cardHeight, 15); 
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `bold ${titleSize}px Roboto, "Segoe UI", Arial, sans-serif`;
+        ctx.fillText(titleText, cardX + padding, cardY + padding);
+        let currentY = cardY + padding + titleLineHeight + 10; 
+        const iconY = currentY - ((iconSize - textSize) / 2);
+        ctx.drawImage(pinImg, cardX + padding, iconY, iconSize, iconSize);
+        ctx.font = `${textSize}px Roboto, "Segoe UI", Arial, sans-serif`;
+        const detailStartX = cardX + padding + iconSize + iconMarginRight;
+        addressLines.forEach(ln => { 
+          ctx.fillText(ln, detailStartX, currentY); 
+          currentY += textLineHeight; 
+        });
+        ctx.fillText(coordText, detailStartX, currentY);
+        currentY += textLineHeight;
+        ctx.fillText(timeText, detailStartX, currentY);
+        res(canvas.toDataURL('image/jpeg',0.75));
+      };
+      pinImg.src = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff5252'%3E%3Cpath d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/%3E%3C/svg%3E";
     };
     img.src = dataURL;
   });
 }
 
-document.getElementById('btnKamera').onclick = () => { document.getElementById('foto').click(); };
-document.getElementById('foto').onchange = (e) => {
-  const f = e.target.files[0]; if(!f) return;
-  const r = new FileReader(); r.onload = (re) => prosesFoto(re.target.result); r.readAsDataURL(f);
-};
-
-/* ---------- SAVE LOGIC ---------- */
-document.getElementById('saveBtn').onclick = () => {
-  const jenis = el.mccb.value, r = document.getElementById('arus_r').value, s = document.getElementById('arus_s').value, t = document.getElementById('arus_t').value, cat = document.getElementById('catatan').value;
-  if(!jenis) return alert("Pilih Panel!");
-  savedReports[jenis] = { jenis, arus_r: r, arus_s: s, arus_t: t, catatan: cat };
-  renderOutput(); showToast("💾 Disimpan.");
-};
-
-function renderOutput() {
-  let h = "<table><tr><th>Panel</th><th>R</th><th>S</th><th>T</th></tr>";
-  for(let k in savedReports) h += `<tr><td>${k}</td><td>${savedReports[k].arus_r}</td><td>${savedReports[k].arus_s}</td><td>${savedReports[k].arus_t}</td></tr>`;
-  output.innerHTML = h + "</table>";
+function wrapTextToArray(ctx, text, maxWidth) {
+  if(!text) return [];
+  const words = text.split(' '), lines = [];
+  let cur = "";
+  for(const w of words){
+    const test = cur ? cur + " " + w : w;
+    if(ctx.measureText(test).width > maxWidth && cur){ 
+      lines.push(cur); 
+      cur = w; 
+    } else {
+      cur = test;
+    }
+  }
+  if(cur) lines.push(cur);
+  return lines; 
 }
 
-/* ---------- OTORITASI V2: SUBMIT FINAL 1 BARIS (INI PERBAIKANNYA) ---------- */
-document.getElementById('submitBtn').onclick = async () => {
-  if (Object.keys(savedReports).length === 0) return alert("Simpan minimal 1 data!");
-  const btn = document.getElementById('submitBtn'); btn.disabled = true; btn.textContent = "⏳ Mengirim V2...";
 
+/* ---------- FOTO: TOMBOL KAMERA & GALERI ---------- */
+function cekValidasiAwal() {
+  const tanggal = document.getElementById("tanggal").value;
+  const shift = document.getElementById("shift").value;
+  if (!shift || !tanggal) {
+    alert("Pilih tanggal & Shift dahulu sebelum memilih foto.");
+    return false;
+  }
+  return true;
+}
+
+btnKamera.addEventListener('click', async () => {
+  if (!cekValidasiAwal()) return;
+  isFromGallery = false;
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  if (isMobile) {
+    foto.setAttribute('capture', 'environment');
+    foto.click();
+  } else {
+    try {
+      desktopStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      videoStream.srcObject = desktopStream;
+      webcamModal.style.display = 'flex';
+    } catch (err) {
+      alert("Kamera laptop tidak ditemukan atau izin diblokir.");
+      foto.removeAttribute('capture');
+      foto.click(); 
+    }
+  }
+});
+
+btnGaleri.addEventListener('click', () => {
+  if (!cekValidasiAwal()) return;
+  isFromGallery = true;
+  foto.removeAttribute('capture'); 
+  foto.click(); 
+});
+
+btnCloseCamera.addEventListener('click', () => {
+  webcamModal.style.display = 'none';
+  if (desktopStream) desktopStream.getTracks().forEach(t => t.stop());
+});
+
+btnSnap.addEventListener('click', () => {
+  cameraCanvas.width = videoStream.videoWidth;
+  cameraCanvas.height = videoStream.videoHeight;
+  cameraCanvas.getContext('2d').drawImage(videoStream, 0, 0);
+  const dataUrl = cameraCanvas.toDataURL('image/jpeg');
+  webcamModal.style.display = 'none';
+  if (desktopStream) desktopStream.getTracks().forEach(t => t.stop());
+  jalankanProsesFoto(dataUrl); 
+});
+
+foto.addEventListener("change", async (ev) => {
+  const file = ev.target.files?.[0];
+  if (!file) return;
+  try {
+    const dataUrl = await readFileAsDataURL(file);
+    await jalankanProsesFoto(dataUrl);
+  } catch (err) {
+    alert("Gagal membaca file gambar.");
+  }
+});
+
+
+async function jalankanProsesFoto(dataUrl) {
+  const tanggal = document.getElementById("tanggal").value;
+  const shift = document.getElementById("shift").value;
+  try {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+    const currentShift = getCurrentShift(now);
+    const isMismatch = (tanggal !== todayStr || shift !== currentShift);
+    let finalTimestamp = "";
+    let skipWM = false;
+    if (!isFromGallery && !isMismatch) {
+      finalTimestamp = formatTimeCustom(now);
+      skipWM = false;
+    } else {
+      const userChoice = await askWatermarkOptions(isMismatch, tanggal, shift, isFromGallery);
+      finalTimestamp = userChoice.timestamp;
+      skipWM = userChoice.skip;
+    }
+    currentCompressedDataURL = await compressAndWatermark(dataUrl, finalTimestamp, skipWM);
+    fotoPreview.src = currentCompressedDataURL;
+    fotoPreview.classList.remove("hidden");
+    downloadBtn.classList.remove("hidden");
+    fotoStatus.textContent = "⏳ Mengunggah foto ke Drive...";
+    const base64 = currentCompressedDataURL.split(",")[1];
+    const body = new URLSearchParams();
+    body.append("filedata", base64);
+    body.append("mimetype", "image/jpeg");
+    body.append("loginTimestamp", loginTimestamp);
+    body.append("petugas", document.getElementById("petugas").value);
+    body.append("satuan_kerja", document.getElementById("satuan_kerja").value);
+    body.append("shift", shift);
+    body.append("tanggal", tanggal);
+    const res = await fetch(fotoUploadURL, { method: "POST", body: body });
+    const text = await res.text();
+    const result = JSON.parse(text);
+    if (result.status === "ok" && result.url) {
+      fotoDriveURL = result.url;
+      fotoStatus.textContent = "✅ Foto tersimpan di Drive.";
+      showToast("📸 Foto tersimpan di Drive.");
+      for (const k in savedReports) {
+        const it = savedReports[k];
+        if (it.satuan_kerja === document.getElementById('satuan_kerja').value && it.tanggal === tanggal && it.shift === shift) {
+          it.foto = fotoDriveURL;
+        }
+      }
+      renderOutput();
+    } else {
+      throw new Error(result.message || "Upload server menolak");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("❌ Gagal memproses/upload foto: " + err.message);
+    fotoStatus.textContent = "❌ Upload gagal.";
+    fotoPreview.classList.add("hidden");
+    downloadBtn.classList.add("hidden");
+  }
+}
+
+downloadBtn.addEventListener('click', () => {
+  if (!currentCompressedDataURL) return;
+  const a = document.createElement('a');
+  a.href = currentCompressedDataURL;
+  a.download = `Foto_MCCB_${document.getElementById('mccb').value || 'File'}_${Date.now()}.jpg`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+});
+
+/* ---------- SAVE per MCCB  ---------- */
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const satuan = document.getElementById('satuan_kerja').value;
+  const petugas = document.getElementById('petugas').value;
+  const tanggal = document.getElementById('tanggal').value;
+  const shift = document.getElementById('shift').value;
+  const jenis = document.getElementById('mccb').value;
+  const r = document.getElementById('arus_r').value;
+  const s = document.getElementById('arus_s').value;
+  const t = document.getElementById('arus_t').value;
+  const catatan = document.getElementById('catatan').value;
+
+  if (!satuan || !petugas || !tanggal || !shift || !jenis) {
+    alert("Lengkapi semua field terlebih dahulu!");
+    return;
+  }
+
+  // Kunci data sekarang pakai jenis saja agar menimpa jika MCCB sama diinput ulang
+  const key = jenis; 
+  savedReports[key] = {
+    satuan_kerja: satuan, petugas: petugas, tanggal: tanggal, shift: shift,
+    jenis: jenis, arus_r: r, arus_s: s, arus_t: t, catatan: catatan,
+    foto: fotoDriveURL || "", savedAt: new Date().toLocaleTimeString()
+  };
+
+  dataPerMCB[jenis] = { r, s, t, catatan };
+  document.getElementById('previewTitle').textContent = "📋 Data Tersimpan (Belum Dikirim)"; 
+  renderOutput();
+  showToast("💾 Data tersimpan / diperbarui.");
+});
+
+function renderOutput() {
+  if (Object.keys(savedReports).length === 0) {
+    output.innerHTML = "<em>Belum ada data tersimpan.</em>";
+    return;
+  }
+  const satuan = document.getElementById('satuan_kerja').value;
+  const petugas = document.getElementById('petugas').value;
+  const urutan = satuan === "Stasiun Pucanggading" ? ORDER_MCCB : ORDER_PDB;
+  const sorted = Object.values(savedReports).sort((a,b) => urutan.indexOf(a.jenis) - urutan.indexOf(b.jenis));
+
+  let html = `<div style="margin-bottom: 15px; font-size: 14px; color: #000;">
+      <table style="width: 100%; border: none; margin: 0; background: transparent;">
+        <tr style="border: none;">
+          <td style="border: none; padding: 4px 0; width: 140px; font-weight: normal;">Nama Petugas</td>
+          <td style="border: none; padding: 4px 0;">: ${petugas}</td>
+        </tr>
+        <tr style="border: none;">
+          <td style="border: none; padding: 4px 0; font-weight: normal;">Satuan Transmisi</td>
+          <td style="border: none; padding: 4px 0;">: ${satuan}</td>
+        </tr>
+      </table>
+    </div>`;
+
+  html += "<div style='overflow-x: auto;'><table><tr><th>Tanggal</th><th>Shift</th><th>Jenis</th><th>R</th><th>S</th><th>T</th><th>Foto</th></tr>";
+  sorted.forEach((r, index) => {
+    html += `<tr><td>${r.tanggal}</td><td>${r.shift}</td><td>${r.jenis}</td><td>${r.arus_r}</td><td>${r.arus_s}</td><td>${r.arus_t}</td>`;
+    if (index === 0) {
+      const fotoCell = r.foto ? `<a href="${r.foto}" target="_blank" style="color: #0056b3; font-weight: bold; text-decoration: none;">lihat</a>` : "";
+      html += `<td rowspan="${sorted.length}" style="text-align: center; vertical-align: middle;">${fotoCell}</td>`;
+    }
+    html += `</tr>`;
+  });
+  html += "</table></div>";
+  output.innerHTML = html;
+}
+
+/* ---------- SUBMIT ALL to metering-data (VERSI FINAL V2 - 1 BARIS) ---------- */  
+document.getElementById('submitBtn').addEventListener('click', async () => {
+  if (Object.keys(savedReports).length === 0) { 
+    alert("Belum ada data yang disimpan! Simpan minimal satu panel dulu."); 
+    return; 
+  }
+
+  // --- FREEZE TOMBOL ---
+  const btnKirim = document.getElementById('submitBtn');
+  btnKirim.disabled = true; 
+  btnKirim.style.background = "#6c757d"; 
+  btnKirim.textContent = "⏳ Sedang memproses... JANGAN DITUTUP";
+  status.textContent = "⏳ Mengirim data ke server...";
+
+  // 1. Siapkan "Bungkus Tunggal" untuk Spreadsheet
   const flatData = {
     tanggal: document.getElementById('tanggal').value,
     shift: document.getElementById('shift').value,
     petugas: document.getElementById('petugas').value,
     satuan_kerja: document.getElementById('satuan_kerja').value,
-    link_foto: fotoDriveURL
+    link_foto: fotoDriveURL || "", // Link foto dari Drive
+    catatan: ""
   };
 
-  let catArray = [];
-  for(let k in savedReports) {
-    const d = savedReports[k], key = k.toLowerCase();
-    if(key.includes("mdb")) { flatData.mdb_r = d.arus_r; flatData.mdb_s = d.arus_s; flatData.mdb_t = d.arus_t; }
-    else if(key.includes("pemancar")) { flatData.pem_r = d.arus_r; flatData.pem_s = d.arus_s; flatData.pem_t = d.arus_t; }
-    else if(key.includes("sarpras")) { flatData.sar_r = d.arus_r; flatData.sar_s = d.arus_s; flatData.sar_t = d.arus_t; }
-    if(d.catatan) catArray.push(`${k}: ${d.catatan}`);
-  }
-  flatData.catatan = catArray.join(" | ");
+  // 2. Mapping Otomatis: Memindahkan Arus dari savedReports ke Kolom yang Benar
+  let listCatatan = [];
+  
+  Object.values(savedReports).forEach(row => {
+    const namaPanel = row.jenis.toLowerCase();
+    
+    // Cek keyword nama panel untuk menentukan kolom
+    if (namaPanel.includes("mdb")) {
+      flatData.mdb_r = row.arus_r;
+      flatData.mdb_s = row.arus_s;
+      flatData.mdb_t = row.arus_t;
+    } else if (namaPanel.includes("pemancar")) {
+      flatData.pem_r = row.arus_r;
+      flatData.pem_s = row.arus_s;
+      flatData.pem_t = row.arus_t;
+    } else if (namaPanel.includes("sarpras")) {
+      flatData.sar_r = row.arus_r;
+      flatData.sar_s = row.arus_s;
+      flatData.sar_t = row.arus_t;
+    }
+    
+    if (row.catatan) listCatatan.push(`${row.jenis}: ${row.catatan}`);
+  });
+
+  // Gabungkan catatan semua panel jadi satu baris teks
+  flatData.catatan = listCatatan.join(" | ");
 
   try {
-    await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(flatData) });
-    alert("✅ SUKSES! Data mendarat 1 baris di V2.");
-    location.reload();
-  } catch (e) { alert("❌ Gagal!"); btn.disabled = false; }
-};
+    // 3. Kirim ke Apps Script sebagai SATU OBJEK
+    await fetch(scriptURL, {
+      method: 'POST',
+      mode: 'no-cors', // Tetap pakai no-cors agar aman di GitHub Pages
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(flatData) 
+    });
 
-document.getElementById("flowBtn").onclick = () => { document.getElementById("flowModal").classList.add("show"); };
-document.getElementById("closeFlow").onclick = () => { document.getElementById("flowModal").classList.remove("show"); };
+    status.textContent = "✅ Sukses! Data 1 baris terkirim ke REKAP_ALL.";
+    showToast("✅ Berhasil Kirim Data V2!");
+    
+    // 4. Bersihkan Form & Preview
+    savedReports = {}; 
+    tempInputs = {};
+    document.getElementById('previewTitle').textContent = "✅ Data Berhasil Terkirim";
+    fotoPreview.classList.add("hidden");
+    downloadBtn.classList.add("hidden");
+    fotoStatus.textContent = "— belum ada foto";
+    fotoDriveURL = "";
+    renderOutput(); 
+    
+    alert("Mantap, Nabila! Data sudah masuk ke Spreadsheet V2 dalam 1 baris.");
+    
+  } catch (err) {
+    console.error(err);
+    status.textContent = "❌ Gagal kirim. Cek koneksi.";
+    showToast("❌ Gagal mengirim data.");
+  } finally {
+    btnKirim.disabled = false; 
+    btnKirim.style.background = "#0056b3"; 
+    btnKirim.textContent = "📤 Kirim ke Spreadsheet Data Metering";
+  }
+});
+const flowBtn = document.getElementById("flowBtn");
+const flowModal = document.getElementById("flowModal");
+const flowImg = document.getElementById("flowImg");
+const closeFlow = document.getElementById("closeFlow");
+const flowImgURL = "https://raw.githubusercontent.com/nonarose/formmeteringaruslistrik/refs/heads/main/flowchart_form.svg";
+flowBtn.addEventListener("click", () => { flowImg.src = flowImgURL; flowModal.classList.add("show"); });
+closeFlow.addEventListener("click", () => { flowModal.classList.remove("show"); });
+flowModal.addEventListener("click", (e) => { if (e.target === flowModal) flowModal.classList.remove("show"); });
+
 </script>
 </body>
 </html>
